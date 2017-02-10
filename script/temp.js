@@ -56,9 +56,17 @@ Vector2.prototype.Multiply = function (vector) {
 	return new Vector2(this.x * vector, this.y * vector);
 };
 
+/**********************************
+***** RANDOM NUMBER GENERATOR *****
+**********************************/
+
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
+
+/**********************************
+***** CONVERT SECONDS TO TIME *****
+**********************************/
 
 function SecondsToTime (s) {
 	var h, m, s;
@@ -79,9 +87,8 @@ var fps = {
 	getFPS : function () {
 		var d, currentTime, result;
 		this.frameNumber++;
-		d 			= new Date().getTime();
-		currentTime = (d - this.startTime) / 1000;
-		//result 		= Math.floor(this.frameNumber / currentTime);
+		d 				= new Date().getTime();
+		currentTime 	= (d - this.startTime) / 1000;
 		result			= (this.frameNumber / currentTime).toFixed(2);
 
 		if (currentTime > 1) {
@@ -122,6 +129,10 @@ var GameTime = {
 		GameTime.lastUpdate		= curTime;
 	}
 };
+
+/*****************************
+***** DRAW TEXT FUNCTION *****
+*****************************/
 
 var DrawText = function (string, x, y, font, color) {
 	game.context.save();
@@ -266,7 +277,7 @@ Lamp.prototype.SetTileMap = function (tileMap) {
 };
 
 Lamp.prototype.SetIlluminatedTiles = function (v0, v1) {
-	var p0, p1, dx, dy, nx, ny, sign_x, sign_y, p, point, points, ix, iy, i, j , isUnique, tile, tileCenter, tX, tY, dist, distPrcnt, tileBG;
+	var p0, p1, dx, dy, nx, ny, sign_x, sign_y, p, point, points, ix, iy, i, j, tile, tileCenter, tX, tY, dist, distPrcnt, tileBG;
 
 	// Convert x,y coordinates to tile x,y indexes
 	p0		= new Vector2(Math.floor(v0.x / game.square), Math.floor(v0.y / game.square));
@@ -345,6 +356,7 @@ Lamp.prototype.update = function (pos) {
 		}
 	}
 
+
 	// If this light moves, update its position
 	if (this.isMoving) this.pos = pos;
 
@@ -378,14 +390,14 @@ Lamp.prototype.draw = function () {
 *****  PLAYER  *****
 *******************/
 function Player (level) {
-	this.level 		= level;
-	this.pos 		= new Vector2(15, 0);
-	this.size 		= new Vector2(game.square, game.square);
-	this.velocity	= new Vector2(0, 0);
+	this.level 					= level;
+	this.pos 					= new Vector2(0, 45);
+	this.size 					= new Vector2(game.square, game.square);
+	this.velocity				= new Vector2(0, 0);
 	// Constants for controling movement
 	this.MoveAcceleration 		= 500.0;
 	this.MaxMoveSpeed 			= 2;
-	this.GroundDragFactor 		= 0.6;
+	this.GroundDragFactor 		= 0.7;
 	this.movementX 				= 0;
 	this.movementY 				= 0;
 
@@ -418,10 +430,11 @@ Player.prototype.SetPos = function (pos) {
 
 Player.prototype.ApplyPhysics = function () {
 
+	// Initialize velocity for x and y
 	this.velocity.x		+= this.movementX * this.MoveAcceleration;
 	this.velocity.y		+= this.movementY * this.MoveAcceleration;
 
-	// Apply pseudo-drag horizontally
+	// Apply pseudo-drag horizontally (friction)
 	this.velocity.x 	*= this.GroundDragFactor;
 	this.velocity.y 	*= this.GroundDragFactor;
 
@@ -429,7 +442,7 @@ Player.prototype.ApplyPhysics = function () {
 	this.velocity.x 	= this.Clamp(this.velocity.x, -this.MaxMoveSpeed, this.MaxMoveSpeed);
 	this.velocity.y 	= this.Clamp(this.velocity.y, -this.MaxMoveSpeed, this.MaxMoveSpeed);
 
-	// Apply velocity to player
+	// Apply final velocity to player
 	this.pos.x 			+= Math.round(this.velocity.x);
 	this.pos.y 			+= Math.round(this.velocity.y);
 
@@ -472,7 +485,7 @@ Player.prototype.HandleCollision = function (gameTime) {
 	for (i = topTile; i <= bottomTile; ++i) {
 		for (j = leftTile; j <= rightTile; ++j) {
 
-			// Put the tile we're looping on in a variable for multiple use
+			// Put the tile we're looping on in a variable for easier use
 			tile = this.level.tiles[i][j];
 			// Create a bounding box for our tile
 			tileRect = new Rectangle(tile.pos.x, tile.pos.y, tileSize.x, tileSize.y);
@@ -504,7 +517,9 @@ Player.prototype.HandleCollision = function (gameTime) {
 						//this.pos.x += depth.x;
 						this.pos.x = localBoundsRect.left + depth.x;
 						this.velocity.x = 0;
-					}
+					} /* else {
+						// Doesn't work.
+					} */
 
 				}
 
@@ -525,11 +540,15 @@ Player.prototype.HandleCollision = function (gameTime) {
 
 Player.prototype.update = function () {
 
+	// Resolve user input
 	this.GetInput();
+	// Apply physics to player
 	this.ApplyPhysics();
 
+	// Update player texture
 	this.texture.update(this.pos);
 
+	// Reset movement variables
 	this.movementX = 0;
 	this.movementY = 0;
 
@@ -539,9 +558,10 @@ Player.prototype.draw = function () {
 	this.texture.draw();
 };
 
-/*******************************************
-**************  CAMERA CLASS  **************
-*******************************************/
+/****************************************************************************************************
+******************************************  CAMERA CLASS  *******************************************
+**************  Adapted from robashton on Github: https://github.com/robashton/camera  **************
+****************************************************************************************************/
 function Camera () {
 	this.distance 		= 0.0;
 	this.lookat 		= [0, 0];
@@ -611,88 +631,123 @@ Camera.prototype = {
 *****  LEVEL  *****
 ******************/
 function Level () {
-	this.tiles 			= [];
-	this.player 		= {};
-	this.playerLight	= {};
-	this.camera 		= {};
-	this.fps 			= 0;
+	this.tiles 				= [];
+	this.player 			= {};
+	this.playerLight		= {};
+	this.camera 			= {};
+	this.fps 				= 0;
+	this.level_max 			= (level.length - 1);	// level is an array of level maps. These are stored in /script/levels (subtract 1 because arrays start at 0)
+	this.level_ind 			= 0;
+	this.map 				= [];
+	this.level_start_time	= 0;
+	this.timer 				= 0;
 
 	this.Initialize();
 }
 
 Level.prototype.Initialize = function () {
+	this.map 				= level[this.level_ind];
 	this.LoadMap();
-	this.player 		= new Player(this);
-	this.playerLight 	= new Lamp(this.player.pos, 50, 100, true, this.tiles);
-	this.lights 		= [];
-	this.lightLimit 	= 20;
-	this.camera 		= new Camera();
+	this.player 			= new Player(this);
+	this.playerLight 		= new Lamp(this.player.pos, 50, 100, true, this.tiles);
+	this.lights 			= [];
+	this.lightLimit 		= 20;
+	this.camera 			= new Camera();
+	this.player.SetPos(this.start_tile_pos);
 	this.camera.moveTo(this.player.pos.x, this.player.pos.y);
+	this.level_start_time	= GameTime.getCurrentGameTime();
+};
+
+Level.prototype.Reset = function () {
+	this.tiles  		= [];
+	this.player 		= [];
+	this.camera 		= [];
+	this.timer 			= 0;
+	this.Initialize();
 };
 
 Level.prototype.LoadMap = function () {
 	var x, y, pos, rNormal, fillColor, type, collision;
 
-	// Set Game variables
-	game.square 		= parseInt(level_1[0][0].s, 10);
-	game.map_size_x 	= parseInt(level_1[0].length, 10);
-	game.map_size_y 	= parseInt(level_1.length, 10);
+	// Set Game variables based on map size
+	game.square 		= parseInt(this.map[0][0].s, 10);
+	game.map_size_x 	= parseInt(this.map[0].length, 10);
+	game.map_size_y 	= parseInt(this.map.length, 10);
 	game.world_width	= game.square * game.map_size_x;
 	game.world_height	= game.square * game.map_size_y;
 
-	rNormal = ['#777777', '#6F6F6F', '#8F8F8F'];
-
+	// Loop through our map to create our tiles array
 	for (y = 0; y < game.map_size_y; y++) {
 		this.tiles[y] = [];
 		for (x = 0; x < game.map_size_x; x++) {
 
+			// Get position and type of tile
 			pos = new Vector2(x * game.square, y * game.square);
-			type = level_1[y][x].t;
+			type = this.map[y][x].t;
 
+			// Based on tile type, set tile color and collision
 			if (type === 'normal') {
-				fillColor = rNormal[random(0,2)];
+				// fillColor = rNormal[random(0,2)];
 				collision = 'PASSABLE';
 			} else if (type === 'wall') {
-				fillColor = '#000000';
+				// fillColor = '#000000';
 				collision = 'IMPASSABLE';
 			} else if (type === 'start') {
-				fillColor = rNormal[random(0,2)];
+				// fillColor = rNormal[random(0,2)];
 				collision = 'START';
-				this.start_tile_pos = pos;
+				this.start_tile_pos = pos;	// Record player start position
 			} else { // EXIT
-				fillColor = '#11BE41';
+				// fillColor = '#11BE41';
 				collision = 'EXIT';
 			}
 
-			this.tiles[y].push(new Tile(pos, fillColor, collision));
+			// Add tile to tile array
+			this.tiles[y].push(new Tile(pos, '#000000', collision));
 
 		}
 	}
 
 };
 
+Level.prototype.FoundExit = function () {
+	this.level_ind = (this.level_ind + 1 > this.level_max) ? 0 : this.level_ind + 1;	// Found exit, go to next level (or back to first level if we've reached the level_max).
+	this.Reset();
+};
+
+Level.prototype.ClearKeyLocks = function () {
+
+	// SPACE: Adds a stationary torch
+	if (this.isSpaceLocked && (GameTime.getCurrentGameTime() - this.spaceLockTime) >= 0.5) this.isSpaceLocked = false;
+
+};
+
 Level.prototype.update = function () {
 
+	// Update FPS
 	this.fps = fps.getFPS();
+	// Update level timer
+	this.timer = Math.floor(GameTime.getCurrentGameTime() - this.level_start_time);
 
-	if (this.isSpaceLocked && (GameTime.getCurrentGameTime() - this.spaceLockTime) >= 0.5) this.isSpaceLocked = false;
+	// Clear key locks
+	this.ClearKeyLocks();
 
 	// Add a light where the player is.
 	if (Input.Keys.GetKey(Input.Keys.SPACE) && !this.isSpaceLocked) {
 
+		// Lock the sapce bar
 		this.isSpaceLocked = true;
 		this.spaceLockTime = GameTime.getCurrentGameTime();
 
+		// If we still have lights to use, add a new light
 		if (this.lightLimit > this.lights.length) {
-			newLight = new Lamp(this.player.pos, 50, 100, false, this.tiles);
+			newLight = new Lamp(this.player.pos, 75, 150, false, this.tiles);
 			newLight.update();
 			this.lights.push(newLight);
 		}
 
-		console.log(this.lights.length);
-
 	}
 
+	// Update our Player and the player light
 	this.player.update();
 	this.playerLight.update(this.player.pos);
 
@@ -700,17 +755,16 @@ Level.prototype.update = function () {
 	cameraPosX = this.player.pos.x + (this.player.size.x / 2) - (game.CANVAS_WIDTH / 2);
 	cameraPosY = this.player.pos.y + (this.player.size.y / 2) - (game.CANVAS_HEIGHT / 2);
 
-	if (cameraPosX < 0) {
+	// Make sure the camera doesn't go past the world bounds
+	if (cameraPosX < 0) 
 		cameraPosX = 0;
-	} else if (cameraPosX > (game.world_width - game.CANVAS_WIDTH)) {
+	else if (cameraPosX > (game.world_width - game.CANVAS_WIDTH))
 		cameraPosX = game.world_width - game.CANVAS_WIDTH;
-	}
 
-	if (cameraPosY < 0) {
+	if (cameraPosY < 0)
 		cameraPosY = 0;
-	} else if (cameraPosY > (game.world_height - game.CANVAS_HEIGHT)) {
+	else if (cameraPosY > (game.world_height - game.CANVAS_HEIGHT))
 		cameraPosY = game.world_height - game.CANVAS_HEIGHT;
-	}
 
 	this.camera.moveTo(cameraPosX, cameraPosY);
 
@@ -721,10 +775,12 @@ Level.prototype.draw = function () {
 
 	this.camera.begin();
 
+	// Draw our lights
 	for (l = 0; l < this.lights.length; l++) {
 		this.lights[l].draw();
 	}
 
+	// Draw player and player light
 	this.playerLight.draw();
 	this.player.draw();
 
@@ -732,6 +788,9 @@ Level.prototype.draw = function () {
 
 	// Draw FPS
 	DrawText('FPS: ' + this.fps, ((game.CANVAS_WIDTH / 2) - 40), 20, 'normal 14pt Century Gothic', 'rgba(255, 255, 255, 0.7)');
+
+	// Draw Timer
+	DrawText('TIMER: ' + SecondsToTime(this.timer), game.CANVAS_WIDTH - 106, 20, 'normal 14pt Century Gothic', 'rgba(255, 255, 255, 0.7)');
 
 	// Draw Number of Lights Left
 	DrawText('LIGHTS LEFT: ' + (this.lightLimit - this.lights.length), 5, (game.CANVAS_HEIGHT - 5), 'normal 14pt Century Gothic', 'rgba(255, 255, 255, 0.7)');
