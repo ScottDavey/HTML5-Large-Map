@@ -786,14 +786,17 @@ Level.prototype.draw = function () {
 
 	this.camera.end();
 
+	// Draw Level Number
+	DrawText('LEVEL: ' + (parseInt(this.level_ind, 10) + 1), 5, 20, 'normal 14pt "Josefin Sans"', 'rgba(255, 255, 255, 0.7)');
+
 	// Draw FPS
-	DrawText('FPS: ' + this.fps, ((game.CANVAS_WIDTH / 2) - 40), 20, 'normal 14pt Century Gothic', 'rgba(255, 255, 255, 0.7)');
+	DrawText('FPS: ' + this.fps, ((game.CANVAS_WIDTH / 2) - 40), 20, 'normal 14pt "Josefin Sans"', 'rgba(255, 255, 255, 0.7)');
 
 	// Draw Timer
-	DrawText('TIMER: ' + SecondsToTime(this.timer), game.CANVAS_WIDTH - 106, 20, 'normal 14pt Century Gothic', 'rgba(255, 255, 255, 0.7)');
+	DrawText('TIMER: ' + SecondsToTime(this.timer), game.CANVAS_WIDTH - 106, 20, 'normal 14pt "Josefin Sans"', 'rgba(255, 255, 255, 0.7)');
 
 	// Draw Number of Lights Left
-	DrawText('LIGHTS LEFT: ' + (this.lightLimit - this.lights.length), 5, (game.CANVAS_HEIGHT - 5), 'normal 14pt Century Gothic', 'rgba(255, 255, 255, 0.7)');
+	DrawText('LIGHTS LEFT: ' + (this.lightLimit - this.lights.length), 5, (game.CANVAS_HEIGHT - 5), 'normal 14pt "Josefin Sans"', 'rgba(255, 255, 255, 0.7)');
 
 };
 

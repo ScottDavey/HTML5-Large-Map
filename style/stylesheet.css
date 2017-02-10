@@ -1,0 +1,18 @@
+* { padding: 0px; margin: 0px auto; }
+html, body { background-color: #101010; font:normal 14pt "Josefin Sans", "Century Gothic", Verdana, Arial; color: #FFFFFF; }
+
+#wrapper { width: 750px; margin-top:50px; }
+
+#wrapper #viewport { width:750px; height:450px; background-color:#000000; border:2px solid #D7AC7D; border-bottom:2px solid #CA9457; border-right:2px solid #CA9457; }
+
+#wrapper #instructions { width: 750px; margin-top: 10px; }
+#wrapper #instructions .left { float:left; }
+#wrapper #instructions #controls { width:202px; }
+#wrapper #instructions #object { width:498px; padding:25px 0px 0px 50px; }
+#wrapper #instructions #object h3 { color:#FF9D4E; font:normal 18pt "Lobster", "Century Gothic", Verdana, Arial; text-align:right; }
+#wrapper #instructions #object #overview { margin-top:5px; }
+
+/** CLEARFIX for floated elements */
+.cf:before, .cf:after { content:""; display:table; } /* For modern browsers */
+.cf:after { clear:both; } /* For modern browsers */
+.cf { *zoom:1; } /* For IE 6/7 (triggers hasLayout) */

@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<style type="text/css">
-		* { padding: 0px; margin: 0px auto; }
-		html, body { background-color: #111111; font:normal 9pt "Century Gothic", Verdana, Arial; color: #FFFFFF; }
-
-		#wrapper { width: 750px; height: 450px; margin-top:50px; background-color:#000000; }
-	</style>
-
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Josefin+Sans" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jura" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans" />
+	<link rel="stylesheet" href="style/stylesheet.css" type="text/css" />
 	<script type="text/javascript" language="javascript" src="script/levels/level.js"></script>
 	<script type="text/javascript" language="javascript" src="script/levels/level_1.js"></script>
 	<script type="text/javascript" language="javascript" src="script/levels/level_2.js"></script>
@@ -17,7 +18,15 @@
 <body onload="game.init();">
 
 	<div id="wrapper">
-		<canvas id="viewport" width="750" height="450"></canvas>
+		<canvas id="viewport" width="750" height="450">This browser doesn't support canvases</canvas>
+
+		<div id="instructions" class="cf">
+			<div id="controls" class="left"><img id="control_img" src="images/Keyboard_Controls.png" /></div>
+			<div id="object" class="left">
+				<h3>OBJECT</h3>
+				<div id="overview">You are the white square. The object of the game is to navigate your way through the dungeon to find the exit. Use your torches sparingly.</div>
+			</div>
+		</div>
 	</div>
 
 </body>
