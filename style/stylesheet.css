@@ -1,7 +1,12 @@
 * { padding: 0px; margin: 0px auto; }
 html, body { background-color: #101010; font:normal 14pt "Josefin Sans", "Century Gothic", Verdana, Arial; color: #FFFFFF; }
 
+a { color:#0D7377; text-decoration: none; }
+a:hover { color:#14FFEC; }
+
 #wrapper { width: 750px; margin-top:50px; }
+
+#wrapper #blurb { width:710px; padding:20px; margin-bottom:10px; background-color:#000000;  }
 
 #wrapper #viewport { width:750px; height:450px; background-color:#000000; border:2px solid #D7AC7D; border-bottom:2px solid #CA9457; border-right:2px solid #CA9457; }
 
