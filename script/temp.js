@@ -641,6 +641,10 @@ function Level () {
 	this.map 				= [];
 	this.level_start_time	= 0;
 	this.timer 				= 0;
+	this.isSpaceLocked		= false;
+	this.spaceLockTime		= 0;
+	this.isRLocked 			= false;
+	this.rLockTime			= 0;
 
 	this.Initialize();
 }
@@ -716,6 +720,9 @@ Level.prototype.FoundExit = function () {
 
 Level.prototype.ClearKeyLocks = function () {
 
+	// R: Reloads current map
+	if (this.isRLocked && (GameTime.getCurrentGameTime() - this.rLockTime) >= 0.5) this.isRLocked = false;
+
 	// SPACE: Adds a stationary torch
 	if (this.isSpaceLocked && (GameTime.getCurrentGameTime() - this.spaceLockTime) >= 0.5) this.isSpaceLocked = false;
 
@@ -731,7 +738,15 @@ Level.prototype.update = function () {
 	// Clear key locks
 	this.ClearKeyLocks();
 
-	// Add a light where the player is.
+	// R: Reload the level
+	if (Input.Keys.GetKey(Input.Keys.R) && !this.isRLocked) {
+		this.isRLocked = true;
+		this.rLockTime = GameTime.getCurrentGameTime();
+
+		this.Reset();
+	}
+
+	// SPACE: Add a light where the player is.
 	if (Input.Keys.GetKey(Input.Keys.SPACE) && !this.isSpaceLocked) {
 
 		// Lock the sapce bar
